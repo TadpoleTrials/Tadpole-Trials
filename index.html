@@ -464,7 +464,7 @@
         </div>
         
         <div class="stats">
-          <p>📚 <span>Levels:</span></p>
+          <p>⭐ <span>Levels:</span></p>
           <p>1: <span>Easy</span> (10 questions)</p>
           <p>2: <span>Medium</span> (10 questions)</p>
           <p>3: <span>Hard</span> (15 questions)</p>
@@ -527,7 +527,7 @@
         height: 30,
         velX: 0,
         velY: 0,
-        speed: isMobile ? 3.0 : 3.5, // Slightly faster on mobile
+        speed: isMobile ? 5.0 : 3.5,
         jumpPower: -12, // Same jump power on all devices
         gravity: 0.5,
         friction: 0.8,
@@ -609,23 +609,30 @@
       document.addEventListener('keydown', handleKeyDown);
       document.addEventListener('keyup', handleKeyUp);
       
-      // Add mobile control event listeners
-      if (isMobile) {
-        // Button press events
-        leftBtn.addEventListener('touchstart', () => gameState.keys.left = true);
-        leftBtn.addEventListener('touchend', () => gameState.keys.left = false);
-        rightBtn.addEventListener('touchstart', () => gameState.keys.right = true);
-        rightBtn.addEventListener('touchend', () => gameState.keys.right = false);
-        upBtn.addEventListener('touchstart', () => gameState.keys.up = true);
-        upBtn.addEventListener('touchend', () => gameState.keys.up = false);
-        jumpBtn.addEventListener('touchstart', () => gameState.keys.up = true);
-        jumpBtn.addEventListener('touchend', () => gameState.keys.up = false);
-        
-        // Prevent context menu on long press
-        [leftBtn, rightBtn, upBtn, jumpBtn].forEach(btn => {
-          btn.addEventListener('contextmenu', e => e.preventDefault());
-        });
-      }
+if (isMobile) {
+  const buttonActions = {
+    leftBtn: 'left',
+    rightBtn: 'right',
+    upBtn: 'up',
+    jumpBtn: 'up'  // jump triggers 'up' key
+  };
+
+  Object.entries(buttonActions).forEach(([id, key]) => {
+    const btn = document.getElementById(id);
+
+    // Touch control logic
+    btn.addEventListener('touchstart', () => gameState.keys[key] = true);
+    btn.addEventListener('touchend', () => gameState.keys[key] = false);
+
+    // Prevent unwanted mobile behavior
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+    btn.addEventListener('selectstart', e => e.preventDefault());
+    btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+
+    // Optional: removes grey highlight on tap
+    btn.style.webkitTapHighlightColor = 'transparent';
+  });
+}
       
       // Initial screen setup
       startScreen.style.display = 'flex';
