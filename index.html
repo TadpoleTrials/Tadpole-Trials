@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tadpole Trials - Mobile Enhanced</title>
+  <title>Tadpole Trials - 1st Rank Biology</title>
   <style>
     * {
       margin: 0;
@@ -285,6 +285,16 @@
       z-index: 5;
       pointer-events: none;
     }
+   
+    #mobileControls button {
+  -webkit-touch-callout: none;  /* iOS Safari */
+  -webkit-user-select: none;    /* Safari */
+  -moz-user-select: none;       /* Firefox */
+  -ms-user-select: none;        /* IE/Edge */
+  user-select: none;            /* Standard syntax */
+  touch-action: manipulation;   /* Disable double-tap zoom */
+  pointer-events: auto;         /* Allow button clicks */
+}
     
     .dpad-container {
       display: flex;
@@ -572,6 +582,21 @@
     const rightBtn = document.getElementById('rightBtn');
     const upBtn = document.getElementById('upBtn');
     const jumpBtn = document.getElementById('jumpBtn');
+
+    // Prevent context menu and text selection on mobile controls
+[leftBtn, rightBtn, upBtn, jumpBtn].forEach(btn => {
+  // Block context menu on long press
+  btn.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    return false;
+  });
+  
+  // Block text selection highlights
+  btn.addEventListener('selectstart', e => {
+    e.preventDefault();
+    return false;
+  });
+});
 
     // Initialize game
     function init() {
