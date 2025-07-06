@@ -1135,23 +1135,23 @@ if (isMobile) {
       );
       ctx.fill();
       
-      // Draw tail - fixed to be opposite of movement direction
-      ctx.beginPath();
-      const tailDirection = -player.direction; // FIX: Invert direction for tail
-      ctx.moveTo(
-        drawX + player.width/2 + (tailDirection * player.width/2), 
-        drawY + player.height/2
-      );
-      ctx.lineTo(
-        drawX + player.width/2 + (tailDirection * player.width), 
-        drawY + player.height/2
-      );
-      ctx.lineTo(
-        drawX + player.width/2 + (tailDirection * player.width/1.5), 
-        drawY + player.height
-      );
-      ctx.closePath();
-      ctx.fill();
+     // ─── Draw tail with wiggle ──────────────────────────────────────────────
+ctx.beginPath();
+
+const now = performance.now();
+const isMoving = gameState.keys.left || gameState.keys.right;
+const tailDirection = -player.direction || 1;
+
+const wiggleY = isMoving ? Math.sin(now / 100) * 5 : 0;
+
+const baseX = drawX + player.width / 2 + tailDirection * player.width / 2;
+const baseY = drawY + player.height / 2 + wiggleY;
+
+ctx.moveTo(baseX, baseY);
+ctx.lineTo(baseX + tailDirection * player.width / 2, baseY);
+ctx.lineTo(baseX + tailDirection * player.width / 3, drawY + player.height + wiggleY);
+ctx.closePath();
+ctx.fill();
       
       // Draw eyes
       ctx.fillStyle = 'white';
