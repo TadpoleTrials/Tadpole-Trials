@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tadpole Trials - 1st Rank Biology</title>
+  <title>Tadpole Trials - Enhanced Biology Game</title>
   <style>
     * {
       margin: 0;
@@ -275,26 +275,33 @@
       font-size: 1.2rem;
     }
     
-    /* Mobile Controls */
-    #mobileControls {
-      display: none;
-      position: absolute;
-      bottom: 20px;
-      width: calc(100% - 30px);
-      justify-content: space-between;
-      z-index: 5;
-      pointer-events: none;
-    }
-   
-    #mobileControls,
+   /* Mobile Controls */
+#mobileControls {
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  width: calc(100% - 30px);
+  justify-content: space-between;
+  z-index: 5;
+  pointer-events: none;
+}
+
+#mobileControls,
 #mobileControls button {
-  -webkit-touch-callout: none;   /* Prevent callout (e.g. Copy/Paste) */
+  -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  touch-action: none;            /* Fully disables gesture interference */
-  -webkit-tap-highlight-color: transparent; /* Remove grey highlight on tap */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Visibility control */
+@media (max-width: 768px) {
+  .game-active #mobileControls {
+    display: flex;
+  }
 }
     
     .dpad-container {
@@ -342,6 +349,27 @@
       user-select: none;
       align-self: flex-end;
       margin-right: 10px;
+    }
+    
+    /* New shoot button */
+    .shoot-btn {
+      width: 70px;
+      height: 70px;
+      background: rgba(200, 0, 0, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      pointer-events: auto;
+      align-self: flex-end;
+      margin-right: 10px;
+      position: absolute;
+      right: 10px;
+      bottom: 90px;
     }
     
     /* Mobile-specific adjustments */
@@ -396,6 +424,11 @@
       #mobileControls {
         display: flex;
       }
+      
+      /* Hide up arrow on mobile */
+      #upBtn {
+        display: none !important;
+      }
     }
     
     @media (max-width: 480px) {
@@ -424,6 +457,13 @@
         height: 60px;
         font-size: 14px;
       }
+      
+      .shoot-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 12px;
+        bottom: 80px;
+      }
     }
   </style>
 </head>
@@ -447,6 +487,7 @@
         </div>
       </div>
       <div class="jump-btn" id="jumpBtn">JUMP</div>
+      <div class="shoot-btn" id="shootBtn">SHOOT</div>
     </div>
     
     <!-- Start Screen -->
@@ -460,7 +501,8 @@
           <p>🎮 <span>Controls:</span></p>
           <p>Move: <span class="key">←</span> <span class="key">→</span></p>
           <p>Jump: <span class="key">↑</span> or <span class="key">Space</span></p>
-          <p>Defeat enemies: <span class="key">Jump</span> on them</p>
+          <p>Shoot: <span class="key">F</span> key or mobile button</p>
+          <p>Defeat enemies: <span class="key">Jump</span> or shoot them</p>
         </div>
         
         <div class="stats">
@@ -510,7 +552,8 @@
 
   <script>
     // Mobile detection
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    // More reliable mobile detection
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
     // Game state with enhanced physics and enemies
     const gameState = {
@@ -528,7 +571,7 @@
         velX: 0,
         velY: 0,
         speed: isMobile ? 5.0 : 3.5,
-        jumpPower: -12, // Same jump power on all devices
+        jumpPower: -12,
         gravity: 0.5,
         friction: 0.8,
         jumping: false,
@@ -539,6 +582,9 @@
       platforms: [],
       brains: [],
       enemies: [],
+      playerProjectiles: [],
+      enemyProjectiles: [],
+      shootCooldown: 0,
       endFlag: null,
       collectedBrains: [],
       quizQuestions: [],
@@ -551,7 +597,8 @@
         left: false,
         right: false,
         up: false,
-        r: false
+        r: false,
+        shoot: false
       },
       gameActive: false,
       cameraX: 0,
@@ -576,6 +623,7 @@
     const collectedCount = document.getElementById('collectedCount');
     const levelIndicator = document.querySelector('.level-indicator');
     const deathOverlay = document.getElementById('deathOverlay');
+    const mobileControls = document.getElementById('mobileControls');
     const ctx = gameCanvas.getContext('2d');
     
     // Mobile control elements
@@ -583,21 +631,23 @@
     const rightBtn = document.getElementById('rightBtn');
     const upBtn = document.getElementById('upBtn');
     const jumpBtn = document.getElementById('jumpBtn');
+    const shootBtn = document.getElementById('shootBtn');
 
-    // Prevent context menu and text selection on mobile controls
-[leftBtn, rightBtn, upBtn, jumpBtn].forEach(btn => {
-  // Block context menu on long press
-  btn.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    return false;
-  });
+// Function to show specific screen and hide others
+function showScreen(screen) {
+  // Hide all screens
+  startScreen.style.display = 'none';
+  gameCanvas.style.display = 'none';
+  quizScreen.style.display = 'none';
+  scoreScreen.style.display = 'none';
+  finalScreen.style.display = 'none';
   
-  // Block text selection highlights
-  btn.addEventListener('selectstart', e => {
-    e.preventDefault();
-    return false;
-  });
-});
+  // Show requested screen
+  screen.style.display = 'flex';
+  
+  // Toggle game-active class on game container (replaces the mobileControls check)
+  document.querySelector('.game-container').classList.toggle('game-active', screen === gameCanvas);
+}
 
     // Initialize game
     function init() {
@@ -609,45 +659,41 @@
       document.addEventListener('keydown', handleKeyDown);
       document.addEventListener('keyup', handleKeyUp);
       
-if (isMobile) {
-  const buttonActions = {
-    leftBtn: 'left',
-    rightBtn: 'right',
-    upBtn: 'up',
-    jumpBtn: 'up'  // jump triggers 'up' key
-  };
+      if (isMobile) {
+        const buttonActions = {
+          leftBtn: 'left',
+          rightBtn: 'right',
+          upBtn: 'up',
+          jumpBtn: 'up',
+          shootBtn: 'shoot'
+        };
 
-  Object.entries(buttonActions).forEach(([id, key]) => {
-    const btn = document.getElementById(id);
+        Object.entries(buttonActions).forEach(([id, key]) => {
+          const btn = document.getElementById(id);
 
-    // Touch control logic
-    btn.addEventListener('touchstart', () => gameState.keys[key] = true);
-    btn.addEventListener('touchend', () => gameState.keys[key] = false);
+          // Touch control logic
+          btn.addEventListener('touchstart', () => gameState.keys[key] = true);
+          btn.addEventListener('touchend', () => gameState.keys[key] = false);
 
-    // Prevent unwanted mobile behavior
-    btn.addEventListener('contextmenu', e => e.preventDefault());
-    btn.addEventListener('selectstart', e => e.preventDefault());
-    btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+          // Prevent unwanted mobile behavior
+          btn.addEventListener('contextmenu', e => e.preventDefault());
+          btn.addEventListener('selectstart', e => e.preventDefault());
+          btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 
-    // Optional: removes grey highlight on tap
-    btn.style.webkitTapHighlightColor = 'transparent';
-  });
-}
+          // Optional: removes grey highlight on tap
+          btn.style.webkitTapHighlightColor = 'transparent';
+        });
+      }
       
       // Initial screen setup
-      startScreen.style.display = 'flex';
-      gameCanvas.style.display = 'none';
-      quizScreen.style.display = 'none';
-      scoreScreen.style.display = 'none';
-      finalScreen.style.display = 'none';
+      showScreen(startScreen);
       deathOverlay.style.display = 'none';
     }
 
     // Start the game
     function startGame() {
       resetGameState();
-      startScreen.style.display = 'none';
-      gameCanvas.style.display = 'block';
+      showScreen(gameCanvas);
       setupLevel(1);
       gameState.gameActive = true;
       requestAnimationFrame(gameLoop);
@@ -676,10 +722,13 @@ if (isMobile) {
       gameState.platforms = [];
       gameState.brains = [];
       gameState.enemies = [];
+      gameState.playerProjectiles = [];
+      gameState.enemyProjectiles = [];
       gameState.quizQuestions = [];
       gameState.score = { correct: 0, total: 0 };
       gameState.cameraX = 0;
       gameState.isDead = false;
+      gameState.shootCooldown = 0;
       
       levelIndicator.textContent = `Level ${level}: ${gameState.levels[level-1].name}`;
       
@@ -714,11 +763,13 @@ if (isMobile) {
         gameState.enemies.push({
           x: 500, y: 200, width: 30, height: 30, 
           velX: 1, minX: 450, maxX: 700,
+          type: 'ground',
           alive: true
         });
         gameState.enemies.push({
           x: 1200, y: 180, width: 30, height: 30, 
           velX: -1.5, minX: 1100, maxX: 1400,
+          type: 'ground',
           alive: true
         });
         
@@ -751,16 +802,20 @@ if (isMobile) {
         gameState.enemies.push({
           x: 600, y: 200, width: 30, height: 30, 
           velX: 1.2, minX: 500, maxX: 800,
+          type: 'ground',
           alive: true
         });
         gameState.enemies.push({
           x: 1400, y: 180, width: 30, height: 30, 
           velX: -1.7, minX: 1300, maxX: 1600,
+          type: 'ground',
           alive: true
         });
+        // Vertical moving enemy
         gameState.enemies.push({
-          x: 2000, y: 200, width: 30, height: 30, 
-          velX: 1.5, minX: 1900, maxX: 2200,
+          x: 1800, y: 150, width: 30, height: 30,
+          velY: 1.5, minY: 100, maxY: 250,
+          type: 'vertical',
           alive: true
         });
         
@@ -782,35 +837,39 @@ if (isMobile) {
         gameState.platforms.push({x: 2400, y: 230, width: 70, height: 20});
         gameState.platforms.push({x: 2600, y: 280, width: 200, height: 20});
         
-          // Add 15 brains - CHANGED THE LAST BRAIN POSITION TO BE MORE REACHABLE
-  for (let i = 0; i < 14; i++) { // First 14 brains stay the same
-    gameState.brains.push({
-      x: 250 + i * 180,
-      y: 250 - (i % 5) * 40,
-      collected: false
-    });
-  }
-  // Add the 15th brain in a more accessible position
-  gameState.brains.push({
-    x: 2750, // Moved closer to the platform edge
-    y: 230,  // Raised slightly higher
-    collected: false
-  });
+        // Add 15 brains
+        for (let i = 0; i < 14; i++) {
+          gameState.brains.push({
+            x: 250 + i * 180,
+            y: 250 - (i % 5) * 40,
+            collected: false
+          });
+        }
+        // Add the 15th brain in a more accessible position
+        gameState.brains.push({
+          x: 2750,
+          y: 230,
+          collected: false
+        });
         
         // Add enemies
         gameState.enemies.push({
           x: 700, y: 150, width: 30, height: 30, 
           velX: 1.5, minX: 600, maxX: 900,
+          type: 'ground',
           alive: true
         });
         gameState.enemies.push({
           x: 1500, y: 150, width: 30, height: 30, 
           velX: -1.8, minX: 1400, maxX: 1700,
+          type: 'ground',
           alive: true
         });
+        // Ranged enemy
         gameState.enemies.push({
           x: 2300, y: 150, width: 30, height: 30, 
-          velX: 1.7, minX: 2200, maxX: 2500,
+          velX: 0, attackTimer: 60, attackRange: 300,
+          type: 'ranged',
           alive: true
         });
       }
@@ -864,6 +923,20 @@ if (isMobile) {
       if (gameState.keys.up && player.grounded) {
         player.velY = player.jumpPower;
         player.grounded = false;
+      }
+      
+      // Shooting
+      if (gameState.keys.shoot && gameState.shootCooldown <= 0) {
+        gameState.playerProjectiles.push({
+          x: player.x + player.width * player.direction,
+          y: player.y + player.height/2,
+          width: 15,
+          height: 15,
+          velX: 7 * player.direction,
+          distance: 0,
+          range: 400
+        });
+        gameState.shootCooldown = 60; // Cooldown frames
       }
       
       // Update position
@@ -926,12 +999,50 @@ if (isMobile) {
       // Update enemies
       for (const enemy of gameState.enemies) {
         if (enemy.alive) {
-          // Move enemy
-          enemy.x += enemy.velX;
-          
-          // Reverse direction at boundaries
-          if (enemy.x <= enemy.minX || enemy.x + enemy.width >= enemy.maxX) {
-            enemy.velX *= -1;
+          // Move enemy based on type
+          if (enemy.type === 'ground') {
+            enemy.x += enemy.velX;
+            if (enemy.x <= enemy.minX || enemy.x + enemy.width >= enemy.maxX) {
+              enemy.velX *= -1;
+            }
+          }
+          else if (enemy.type === 'vertical') {
+            enemy.y += enemy.velY;
+            if (enemy.y <= enemy.minY || enemy.y >= enemy.maxY) {
+              enemy.velY *= -1;
+            }
+          }
+          else if (enemy.type === 'ranged') {
+            // Update attack timer
+            enemy.attackTimer--;
+            if (enemy.attackTimer <= 0) {
+              // Calculate direction to player
+              const dx = player.x - enemy.x;
+              const dy = player.y - enemy.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              // Only shoot if player is in range
+              if (distance < enemy.attackRange) {
+                // Normalize direction
+                const velX = dx / distance * 3;
+                const velY = dy / distance * 3;
+                
+                // Create projectile
+                gameState.enemyProjectiles.push({
+                  x: enemy.x + enemy.width/2,
+                  y: enemy.y + enemy.height/2,
+                  width: 10,
+                  height: 10,
+                  velX: velX,
+                  velY: velY,
+                  distance: 0,
+                  range: enemy.attackRange
+                });
+                
+                // Reset attack timer
+                enemy.attackTimer = 120;
+              }
+            }
           }
           
           // Enemy collision with player
@@ -955,6 +1066,9 @@ if (isMobile) {
         }
       }
       
+      // Update projectiles
+      updateProjectiles();
+      
       // End flag collision
       if (
         player.x < gameState.endFlag.x + gameState.endFlag.width &&
@@ -963,6 +1077,62 @@ if (isMobile) {
         player.y + player.height > gameState.endFlag.y
       ) {
         endLevel();
+      }
+      
+      // Update shoot cooldown
+      if (gameState.shootCooldown > 0) {
+        gameState.shootCooldown--;
+      }
+    }
+    
+    // Update projectiles
+    function updateProjectiles() {
+      // Player projectiles
+      for (let i = gameState.playerProjectiles.length - 1; i >= 0; i--) {
+        const p = gameState.playerProjectiles[i];
+        p.x += p.velX;
+        p.distance += Math.abs(p.velX);
+        
+        // Check enemy collisions
+        let hit = false;
+        for (const enemy of gameState.enemies) {
+          if (enemy.alive && 
+              p.x < enemy.x + enemy.width &&
+              p.x + p.width > enemy.x &&
+              p.y < enemy.y + enemy.height &&
+              p.y + p.height > enemy.y) {
+            enemy.alive = false;
+            hit = true;
+            break;
+          }
+        }
+        
+        // Remove projectiles that hit or exceed range
+        if (hit || p.distance > p.range) {
+          gameState.playerProjectiles.splice(i, 1);
+        }
+      }
+      
+      // Enemy projectiles
+      for (let i = gameState.enemyProjectiles.length - 1; i >= 0; i--) {
+        const p = gameState.enemyProjectiles[i];
+        p.x += p.velX;
+        p.y += p.velY;
+        p.distance += Math.sqrt(p.velX * p.velX + p.velY * p.velY);
+        
+        // Check player collision
+        const player = gameState.player;
+        if (p.x < player.x + player.width &&
+            p.x + p.width > player.x &&
+            p.y < player.y + player.height &&
+            p.y + p.height > player.y) {
+          playerDie();
+          gameState.enemyProjectiles.splice(i, 1);
+        } 
+        // Remove projectiles that exceed range
+        else if (p.distance > p.range) {
+          gameState.enemyProjectiles.splice(i, 1);
+        }
       }
     }
 
@@ -1001,7 +1171,7 @@ if (isMobile) {
           gameState.brains.forEach(brain => brain.collected = false);
 
           hideRestartMessage();
-          loadLevel(gameState.level);
+          setupLevel(gameState.currentLevel);
         }, 2000);
 
       } else {
@@ -1090,24 +1260,121 @@ if (isMobile) {
       // Draw enemies
       for (const enemy of gameState.enemies) {
         if (enemy.alive) {
-          ctx.fillStyle = '#FF0000';
-          ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, enemy.height);
-          
-          // Draw enemy eyes
-          ctx.fillStyle = 'white';
-          ctx.beginPath();
-          const eyeOffset = enemy.velX > 0 ? 8 : 2;
-          ctx.arc(enemy.x - cameraX + eyeOffset, enemy.y + 10, 4, 0, Math.PI * 2);
-          ctx.arc(enemy.x - cameraX + enemy.width - eyeOffset, enemy.y + 10, 4, 0, Math.PI * 2);
-          ctx.fill();
-          
-          ctx.fillStyle = 'black';
-          ctx.beginPath();
-          ctx.arc(enemy.x - cameraX + eyeOffset, enemy.y + 10, 2, 0, Math.PI * 2);
-          ctx.arc(enemy.x - cameraX + enemy.width - eyeOffset, enemy.y + 10, 2, 0, Math.PI * 2);
-          ctx.fill();
+          // Draw enemy based on type
+          if (enemy.type === 'ground' || enemy.type === 'vertical') {
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, enemy.height);
+            
+            // Draw enemy eyes
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            const eyeOffset = (enemy.type === 'ground' && enemy.velX > 0) ? 8 : 2;
+            ctx.arc(enemy.x - cameraX + eyeOffset, enemy.y + 10, 4, 0, Math.PI * 2);
+            ctx.arc(enemy.x - cameraX + enemy.width - eyeOffset, enemy.y + 10, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(enemy.x - cameraX + eyeOffset, enemy.y + 10, 2, 0, Math.PI * 2);
+            ctx.arc(enemy.x - cameraX + enemy.width - eyeOffset, enemy.y + 10, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          else if (enemy.type === 'ranged') {
+            // Draw ranged enemy (different color)
+            ctx.fillStyle = '#FFA500';
+            ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, enemy.height);
+            
+            // Draw enemy eyes
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(enemy.x - cameraX + 15, enemy.y + 10, 4, 0, Math.PI * 2);
+            ctx.arc(enemy.x - cameraX + enemy.width - 15, enemy.y + 10, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(enemy.x - cameraX + 15, enemy.y + 10, 2, 0, Math.PI * 2);
+            ctx.arc(enemy.x - cameraX + enemy.width - 15, enemy.y + 10, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
       }
+      
+      // Draw projectiles
+ // Player projectiles (fixed version)
+for (const p of gameState.playerProjectiles) {
+  // Darker blue-teal gradient
+  const gradient = ctx.createRadialGradient(
+    p.x - cameraX, p.y, 0,
+    p.x - cameraX, p.y, p.width/2
+  );
+  gradient.addColorStop(0, 'rgba(0, 150, 200, 0.9)');  // Darker center
+  gradient.addColorStop(0.7, 'rgba(0, 100, 150, 0.8)'); // Mid tone
+  gradient.addColorStop(1, 'rgba(0, 80, 120, 0.6)');   // Darker edge
+
+  // Main bubble
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(p.x - cameraX, p.y, p.width/2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Thicker dark outline
+  ctx.strokeStyle = 'rgba(0, 60, 90, 0.9)';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(p.x - cameraX, p.y, p.width/2, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Smaller, subtle highlight (FIXED: changed 'y' to 'p.y')
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
+  ctx.beginPath();
+  ctx.arc(
+    p.x - cameraX - p.width/6, 
+    p.y - p.height/6,  // This was the problematic line - now fixed
+    p.width/5,
+    0, 
+    Math.PI * 2
+  );
+  ctx.fill();
+}
+
+// Enemy projectiles (darker and more ominous)
+for (const p of gameState.enemyProjectiles) {
+  // Dark red gradient
+  const gradient = ctx.createRadialGradient(
+    p.x - cameraX, p.y, 0,
+    p.x - cameraX, p.y, p.width/2
+  );
+  gradient.addColorStop(0, 'rgba(180, 0, 0, 0.9)');   // Blood red center
+  gradient.addColorStop(0.7, 'rgba(120, 0, 0, 0.8)'); // Dark red mid
+  gradient.addColorStop(1, 'rgba(80, 0, 0, 0.6)');    // Very dark edge
+
+  // Main projectile
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(p.x - cameraX, p.y, p.width/2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Pulsing dark outline
+  const pulseSize = Math.sin(Date.now()/100) * 1.5;
+  ctx.strokeStyle = 'rgba(255, 100, 100, 0.8)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(
+    p.x - cameraX, 
+    p.y, 
+    p.width/2 + pulseSize, 
+    0, 
+    Math.PI * 2
+  );
+  ctx.stroke();
+  
+  // Dark core for contrast
+  ctx.fillStyle = 'rgba(50, 0, 0, 0.7)';
+  ctx.beginPath();
+  ctx.arc(p.x - cameraX, p.y, p.width/4, 0, Math.PI * 2);
+  ctx.fill();
+}
       
       // Draw end flag
       ctx.fillStyle = '#4CAF50';
@@ -1121,7 +1388,7 @@ if (isMobile) {
       ctx.closePath();
       ctx.fill();
       
-       // Draw player (tadpole) with fixed direction
+      // Draw player (tadpole) with fixed direction
       const player = gameState.player;
       const drawX = player.x - cameraX;
       const drawY = player.y;
@@ -1135,23 +1402,20 @@ if (isMobile) {
       );
       ctx.fill();
       
-     // ─── Draw tail with wiggle ──────────────────────────────────────────────
-ctx.beginPath();
-
-const now = performance.now();
-const isMoving = gameState.keys.left || gameState.keys.right;
-const tailDirection = -player.direction || 1;
-
-const wiggleY = isMoving ? Math.sin(now / 100) * 5 : 0;
-
-const baseX = drawX + player.width / 2 + tailDirection * player.width / 2;
-const baseY = drawY + player.height / 2 + wiggleY;
-
-ctx.moveTo(baseX, baseY);
-ctx.lineTo(baseX + tailDirection * player.width / 2, baseY);
-ctx.lineTo(baseX + tailDirection * player.width / 3, drawY + player.height + wiggleY);
-ctx.closePath();
-ctx.fill();
+      // Draw tail with wiggle
+      ctx.beginPath();
+      const now = performance.now();
+      const isMoving = gameState.keys.left || gameState.keys.right;
+      const tailDirection = -player.direction || 1;
+      const wiggleY = isMoving ? Math.sin(now / 100) * 5 : 0;
+      const baseX = drawX + player.width / 2 + tailDirection * player.width / 2;
+      const baseY = drawY + player.height / 2 + wiggleY;
+      
+      ctx.moveTo(baseX, baseY);
+      ctx.lineTo(baseX + tailDirection * player.width / 2, baseY);
+      ctx.lineTo(baseX + tailDirection * player.width / 3, drawY + player.height + wiggleY);
+      ctx.closePath();
+      ctx.fill();
       
       // Draw eyes
       ctx.fillStyle = 'white';
@@ -1215,32 +1479,31 @@ ctx.fill();
       drawCloud(900 - cameraX/3, 65);
       drawCloud(1100 - cameraX/3, 55);
       
-     // Sun rays
-const sunX = 700;
-const sunY = 80;
-const rayLength = 60;
-const rayCount = 12;
-
-ctx.strokeStyle = 'rgba(255, 235, 59, 0.6)';
-ctx.lineWidth = 2;
-for (let i = 0; i < rayCount; i++) {
-  const angle = (Math.PI * 2 / rayCount) * i;
-  const startX = sunX + Math.cos(angle) * 45;
-  const startY = sunY + Math.sin(angle) * 45;
-  const endX = sunX + Math.cos(angle) * (45 + rayLength);
-  const endY = sunY + Math.sin(angle) * (45 + rayLength);
-  ctx.beginPath();
-  ctx.moveTo(startX, startY);
-  ctx.lineTo(endX, endY);
-  ctx.stroke();
-}
-
-// Sun body
-ctx.fillStyle = '#FFEB3B';
-ctx.beginPath();
-ctx.arc(sunX, sunY, 40, 0, Math.PI * 2);
-ctx.fill();
-
+      // Sun rays
+      const sunX = 700;
+      const sunY = 80;
+      const rayLength = 60;
+      const rayCount = 12;
+      
+      ctx.strokeStyle = 'rgba(255, 235, 59, 0.6)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < rayCount; i++) {
+        const angle = (Math.PI * 2 / rayCount) * i;
+        const startX = sunX + Math.cos(angle) * 45;
+        const startY = sunY + Math.sin(angle) * 45;
+        const endX = sunX + Math.cos(angle) * (45 + rayLength);
+        const endY = sunY + Math.sin(angle) * (45 + rayLength);
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      }
+      
+      // Sun body
+      ctx.fillStyle = '#FFEB3B';
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 40, 0, Math.PI * 2);
+      ctx.fill();
       
       // Distant hills
       ctx.fillStyle = 'rgba(144, 238, 144, 0.6)';
@@ -1267,8 +1530,7 @@ ctx.fill();
     // End level and show quiz
     function endLevel() {
       gameState.gameActive = false;
-      gameCanvas.style.display = 'none';
-      quizScreen.style.display = 'flex';
+      showScreen(quizScreen);
       
       // Get the appropriate question bank
       let bank;
@@ -1347,36 +1609,31 @@ ctx.fill();
     }
 
     function showScoreScreen() {
-  quizScreen.style.display = 'none';
-  scoreScreen.style.display = 'flex';
+      showScreen(scoreScreen);
 
-  const correct = gameState.score.correct;
-  const total = gameState.score.total;
-  const percentage = Math.round((correct / total) * 100);
+      const correct = gameState.score.correct;
+      const total = gameState.score.total;
+      const percentage = Math.round((correct / total) * 100);
 
-  scoreSummary.textContent = `You scored ${correct}/${total} (${percentage}%) on the ${gameState.levels[gameState.currentLevel - 1].name} quiz!`;
+      scoreSummary.textContent = `You scored ${correct}/${total} (${percentage}%) on the ${gameState.levels[gameState.currentLevel - 1].name} quiz!`;
 
-if (gameState.currentLevel === 3) {
-  // Immediately hide score screen and show final screen
-  scoreScreen.style.display = 'none';
-  finalScreen.style.display = 'flex';
-
-  finalText.textContent =
-    `🎓 You've completed all 3 levels!\n` +
-    `Final Score: ${correct}/${total} (${percentage}%)\n\n` +
-    `Thanks for playing Tadpole Trials!\nGood luck with your Biology studies! 🧠📘`;
-  
-  // Optional: Reset game state if needed (depends on your game logic)
-  // gameState.currentLevel = 1; 
-} else {
-  nextBtn.style.display = 'inline-block';
-}
-}
+      if (gameState.currentLevel === 3) {
+        // Immediately hide score screen and show final screen
+        setTimeout(() => {
+          showScreen(finalScreen);
+          finalText.textContent =
+            `🎓 You've completed all 3 levels!\n` +
+            `Final Score: ${correct}/${total} (${percentage}%)\n\n` +
+            `Thanks for playing Tadpole Trials!\nGood luck with your Biology studies! 🧠📘`;
+        }, 1500);
+      } else {
+        nextBtn.style.display = 'inline-block';
+      }
+    }
 
     // Retry current level
     function retryLevel() {
-      scoreScreen.style.display = 'none';
-      gameCanvas.style.display = 'block';
+      showScreen(gameCanvas);
       setupLevel(gameState.currentLevel);
       gameState.gameActive = true;
       requestAnimationFrame(gameLoop);
@@ -1386,8 +1643,7 @@ if (gameState.currentLevel === 3) {
     function nextLevel() {
       if (gameState.currentLevel < 3) {
         setupLevel(gameState.currentLevel + 1);
-        scoreScreen.style.display = 'none';
-        gameCanvas.style.display = 'block';
+        showScreen(gameCanvas);
         gameState.gameActive = true;
         requestAnimationFrame(gameLoop);
       } else {
@@ -1395,10 +1651,14 @@ if (gameState.currentLevel === 3) {
       }
     }
 
+    // Show final screen
+    function showFinalScreen() {
+      showScreen(finalScreen);
+    }
+
     // Restart game
     function restartGame() {
-      finalScreen.style.display = 'none';
-      startGame();
+      showScreen(startScreen);
     }
 
     // Reset game state
@@ -1421,6 +1681,8 @@ if (gameState.currentLevel === 3) {
         gameState.keys.up = true;
       } else if (e.key === 'r' || e.key === 'R') {
         gameState.keys.r = true;
+      } else if (e.key === 'f' || e.key === 'F') {
+        gameState.keys.shoot = true;
       }
     }
 
@@ -1434,10 +1696,12 @@ if (gameState.currentLevel === 3) {
         gameState.keys.up = false;
       } else if (e.key === 'r' || e.key === 'R') {
         gameState.keys.r = false;
+      } else if (e.key === 'f' || e.key === 'F') {
+        gameState.keys.shoot = false;
       }
     }
 
-    // Question banks
+   // Question banks
     const questionBanks = {
       easy: [
         {
