@@ -89,6 +89,7 @@
   z-index: 2;
 }
 
+
 .controls-info {
   position: absolute;
   bottom: 80px;
@@ -2127,7 +2128,7 @@ for (const p of gameState.enemyProjectiles) {
   switch(level) {
     // Level 1: Underwater (introduction)
     case 1:
-      drawUnderwaterBackground(cameraX, true); // Brighter version
+      drawBiolakeBackground(cameraX, true); 
       break;
       // Level 2: Forest (gentle rain)
     case 2:
@@ -2298,6 +2299,185 @@ function drawSeaweed(x, y) {
   ctx.strokeStyle = '#2a7a3a';
   ctx.lineWidth = 3;
   ctx.stroke();
+}
+
+function drawBiolakeBackground(cameraX) {
+  // Night water gradient (deep blue to dark teal)
+  const waterGradient = ctx.createLinearGradient(0, 0, 0, gameCanvas.height);
+  waterGradient.addColorStop(0, '#0a2a3a');  // Surface (very dark blue)
+  waterGradient.addColorStop(1, '#051a1a');  // Depth (dark teal)
+  ctx.fillStyle = waterGradient;
+  ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+  // Moon reflection (subtle light path)
+  ctx.fillStyle = 'rgba(100, 150, 200, 0.1)';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  for (let i = 0; i < 10; i++) {
+    const x = i * 200 - cameraX * 0.1;
+    const width = 100 + Math.sin(i) * 30;
+    ctx.lineTo(x, 0);
+    ctx.lineTo(x + width, gameCanvas.height);
+  }
+  ctx.lineTo(gameCanvas.width, gameCanvas.height);
+  ctx.closePath();
+  ctx.fill();
+
+  // Glowing lily pads (platforms will go on top of these)
+  for (let i = 0; i < 12; i++) {
+    const x = (i * 250 + cameraX * 0.3) % (gameCanvas.width + 500);
+    const y = gameCanvas.height - 50 + Math.sin(i * 0.5) * 10;
+    
+    // Outer glow
+    const glowGradient = ctx.createRadialGradient(
+      x, y, 30,
+      x, y, 60
+    );
+    glowGradient.addColorStop(0, 'rgba(100, 200, 150, 0.4)');
+    glowGradient.addColorStop(1, 'rgba(100, 200, 150, 0)');
+    ctx.fillStyle = glowGradient;
+    ctx.beginPath();
+    ctx.arc(x, y, 60, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Lily pad base
+    ctx.fillStyle = '#1a3a2a';
+    ctx.beginPath();
+    ctx.ellipse(x, y, 50, 30, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Glowing veins
+    ctx.strokeStyle = 'rgba(100, 255, 200, 0.6)';
+    ctx.lineWidth = 1.5;
+    for (let v = 0; v < 8; v++) {
+      const angle = (Math.PI * 2 / 8) * v;
+      const innerX = x + Math.cos(angle) * 10;
+      const innerY = y + Math.sin(angle) * 10;
+      const outerX = x + Math.cos(angle) * 40;
+      const outerY = y + Math.sin(angle) * 25;
+      ctx.beginPath();
+      ctx.moveTo(innerX, innerY);
+      ctx.lineTo(outerX, outerY);
+      ctx.stroke();
+    }
+  }
+
+  // Fireflies (animated glowing dots)
+  ctx.fillStyle = 'rgba(200, 255, 150, 0.8)';
+  for (let i = 0; i < 20; i++) {
+    const baseX = (i * 150 + cameraX * 0.2) % (gameCanvas.width + 300);
+    const timeOffset = i * 100;
+    const x = baseX + Math.sin((Date.now() + timeOffset) * 0.001) * 50;
+    const y = 100 + (i * 30) % (gameCanvas.height - 200) + 
+              Math.sin((Date.now() + timeOffset) * 0.002) * 40;
+    
+    // Glow effect
+    const glow = ctx.createRadialGradient(
+      x, y, 0,
+      x, y, 10
+    );
+    glow.addColorStop(0, 'rgba(200, 255, 150, 0.8)');
+    glow.addColorStop(1, 'rgba(200, 255, 150, 0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Core light
+    ctx.fillStyle = 'rgba(255, 255, 200, 0.9)';
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Glowing reeds (background plants)
+  for (let i = 0; i < 15; i++) {
+    const x = (i * 180 - cameraX * 0.5) % (gameCanvas.width + 400);
+    const height = 100 + Math.sin(i) * 40;
+    drawGlowingReed(x, gameCanvas.height - 30, height);
+  }
+
+  
+  // here's a very subtle version of the mushrooms:
+  if (false) { // Change to 'true' if you want minimal mushrooms
+    ctx.fillStyle = 'rgba(120, 80, 180, 0.15)'; // Much more subtle purple
+    for (let i = 0; i < 5; i++) { // Fewer mushrooms
+      const x = (i * 500 - cameraX * 0.1) % (gameCanvas.width + 800); // More spread out
+      const y = gameCanvas.height - 70;
+      const size = 15;
+      
+      // Just simple caps without glow effect
+      ctx.beginPath();
+      ctx.arc(x, y - size, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+// Draw glowing reed plant
+function drawGlowingReed(x, y, height) {
+  // Main stem with glow
+  const stemGradient = ctx.createLinearGradient(x, y, x, y - height);
+  stemGradient.addColorStop(0, 'rgba(50, 150, 100, 0.8)');
+  stemGradient.addColorStop(1, 'rgba(100, 200, 150, 0.4)');
+  ctx.strokeStyle = stemGradient;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + 5, y - height);
+  ctx.stroke();
+  
+  // Glowing nodes
+  for (let i = 0; i < 3; i++) {
+    const nodeY = y - (height / 4) * (i + 1);
+    const nodeGlow = ctx.createRadialGradient(
+      x + 3, nodeY, 0,
+      x + 3, nodeY, 8
+    );
+    nodeGlow.addColorStop(0, 'rgba(100, 255, 200, 0.8)');
+    nodeGlow.addColorStop(1, 'rgba(100, 255, 200, 0)');
+    ctx.fillStyle = nodeGlow;
+    ctx.beginPath();
+    ctx.arc(x + 3, nodeY, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Leaves with subtle glow
+  for (let i = 0; i < 4; i++) {
+    const leafY = y - (height / 5) * (i + 1);
+    const leafLength = 30 + Math.sin(i) * 15;
+    
+    ctx.strokeStyle = 'rgba(100, 200, 150, 0.6)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + 3, leafY);
+    ctx.quadraticCurveTo(
+      x + 20 + i * 5, 
+      leafY - leafLength/2, 
+      x + 10, 
+      leafY - leafLength
+    );
+    ctx.stroke();
+    
+    // Leaf glow
+    const leafGlow = ctx.createRadialGradient(
+      x + 10, leafY - leafLength/2, 0,
+      x + 10, leafY - leafLength/2, leafLength/2
+    );
+    leafGlow.addColorStop(0, 'rgba(100, 200, 150, 0.2)');
+    leafGlow.addColorStop(1, 'rgba(100, 200, 150, 0)');
+    ctx.fillStyle = leafGlow;
+    ctx.beginPath();
+    ctx.moveTo(x + 3, leafY);
+    ctx.quadraticCurveTo(
+      x + 20 + i * 5, 
+      leafY - leafLength/2, 
+      x + 10, 
+      leafY - leafLength
+    );
+    ctx.lineTo(x + 3, leafY);
+    ctx.fill();
+  }
 }
 
 function drawCityBackground(cameraX) {
