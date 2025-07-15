@@ -540,27 +540,41 @@
 
     @media (max-width: 768px) and (orientation: portrait) {
   .game-container.game-active #mobileControls {
-    position: static; /* normal flow below canvas */
+    position: static;
     margin-top: 10px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
     gap: 10px;
     width: 100%;
-    padding-bottom: 10px;
+    padding: 0 10px 10px;
   }
 
+  .left-controls,
+  .right-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .left-controls {
+    align-items: flex-start;
+  }
+
+  .right-controls {
+    align-items: flex-end;
+  }
+
+  .jump-btn,
   .shoot-btn {
     position: static;
-    margin: 5px;
-    align-self: center;
-  }
-
-  .jump-btn {
-    align-self: center;
-    margin: 5px;
+    margin: 0;
+    width: 60px;
+    height: 60px;
+    font-size: 14px;
   }
 }
+
 
   </style>
 </head>
@@ -584,8 +598,8 @@
     <div class="death-message">Oh no! Press R to respawn</div>
   </div>
 
-<!-- Mobile Controls -->
-  <div id="mobileControls">
+<div id="mobileControls">
+  <div class="left-controls">
     <div class="dpad-container">
       <div class="dpad-row">
         <div class="control-btn" id="upBtn">↑</div>
@@ -596,9 +610,14 @@
         <div class="control-btn" id="rightBtn">→</div>
       </div>
     </div>
+  </div>
+
+  <div class="right-controls">
     <div class="jump-btn" id="jumpBtn">JUMP</div>
     <div class="shoot-btn" id="shootBtn">SHOOT</div>
   </div>
+</div>
+
 
   <!-- Quiz Screen -->
   <div id="quiz" class="screen">
