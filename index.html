@@ -553,10 +553,12 @@
   }
 
   .right-controls {
-    flex-direction: column-reverse;
-    align-items: flex-end;
-    gap: 15px; /* spacing between buttons */
-  }
+  display: flex; /* 👈 REQUIRED for gap to work */
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 15px;
+}
+
 
   .jump-btn,
   .shoot-btn {
