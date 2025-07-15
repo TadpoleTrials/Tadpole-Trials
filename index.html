@@ -540,7 +540,7 @@
     }
 
     @media (max-width: 768px) and (orientation: portrait) {
-  .game-container.game-active #mobileControls {
+  #mobileControls {
     position: static;
     margin-top: 10px;
     flex-direction: row;
@@ -549,20 +549,11 @@
     gap: 10px;
     width: 100%;
     padding: 0 10px 10px;
-  }
-
-  .left-controls,
-  .right-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .left-controls {
-    align-items: flex-start;
+    pointer-events: auto;
   }
 
   .right-controls {
+    flex-direction: column-reverse; /* 👈 puts JUMP below SHOOT */
     align-items: flex-end;
   }
 
@@ -575,6 +566,7 @@
     font-size: 14px;
   }
 }
+
 
 
   </style>
