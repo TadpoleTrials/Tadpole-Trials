@@ -40,21 +40,35 @@
       display: inline-block;
     }
     
-    
     .game-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 800px;
-      background: rgba(0, 20, 40, 0.85);
-      border-radius: 15px;
-      padding: 15px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 100, 200, 0.5);
-      border: 2px solid #00ccff;
-      position: relative;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Default (e.g. start screen, menus) */
+.game-container:not(.game-active) {
+  background: rgba(0, 20, 40, 0.85);
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 0 20px rgba(0, 100, 200, 0.5);
+  border: 2px solid #00ccff;
+}
+
+/* During gameplay: strip visual styles */
+.game-container.game-active {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
     
     .screen {
       width: 100%;
@@ -65,7 +79,7 @@
       padding: 15px;
     }
     
-    /* Updated Start Screen Styles */
+    /* Start Screen - Original with small tweaks */
 #startScreen {
   width: 100%;
   max-width: 800px;
@@ -74,35 +88,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Changed from center to flex-start */
-  min-height: 400px; /* Minimum height */
-  overflow: hidden;
+  justify-content: center;
 }
 
 #startCanvas {
   width: 100%;
   height: auto; /* Changed from fixed height */
-  aspect-ratio: 2/1; /* Maintain 2:1 aspect ratio */
+  min-height: 300px;
   max-height: 400px;
+  aspect-ratio: 800/400; /* Maintain original aspect ratio */
   display: block;
 }
 
 #startBtn {
   margin-top: 20px;
   z-index: 2;
-  position: relative; /* Ensure it stays above canvas */
 }
 
 .controls-info {
   position: absolute;
-  bottom: 65px; /* Adjusted from 80px */
+  bottom: 80px;
   left: 0;
   width: 100%;
   text-align: center;
   color: rgba(255,255,255,0.8);
-  font-size: clamp(16px, 4vw, 20px); /* Responsive font size */
+  font-size: 20px;
   pointer-events: none;
-  padding: 10px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
     
@@ -305,7 +317,6 @@
     }
     
    /* Mobile Controls */
-/* Mobile Controls - initially hidden */
 #mobileControls {
   display: none;
   position: absolute;
@@ -316,9 +327,11 @@
   pointer-events: none;
 }
 
-/* Show mobile controls only when game is active AND on mobile */
-.game-container.game-active #mobileControls {
-  display: flex;
+/* Show only during gameplay on mobile */
+@media (max-width: 768px) {
+  .game-container.game-active #mobileControls {
+    display: flex;
+  }
 }
 
 #mobileControls,
@@ -406,130 +419,127 @@
       right: 10px;
       bottom: 90px;
     }
-
-    /* =========================
-   📱 Base Mobile Styles (≤768px)
-   ========================= */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  h1:after {
-    right: -35px;
-    font-size: 1.8rem;
-  }
-
-  .game-container {
-    padding: 10px;
-    border-radius: 12px;
-  }
-
-  .screen {
-    padding: 10px;
-  }
-
-  #quiz, #scoreScreen, #finalScreen {
-    padding: 15px;
-  }
-
-  #questionText {
-    font-size: 1.1rem;
-  }
-
-  .optionBtn {
-    padding: 10px;
-    font-size: 0.95rem;
-  }
-
-  button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    min-width: 120px;
-  }
-
-  .stats,
-  .controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  #mobileControls {
-    display: flex;
-  }
-
-  /* Hide up arrow on mobile (redundant with jump button) */
-  #upBtn {
-    display: none !important;
-  }
-}
-/* ========================================
-   📱 Portrait-Specific Tweaks (≤768px & ≤480px)
-   ======================================== */
-
-/* Medium screen portrait (e.g. tablets or tall phones) */
+    
+    /* Mobile-specific adjustments */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h1:after {
+        right: -35px;
+        font-size: 1.8rem;
+      }
+      
+      .game-container {
+        padding: 10px;
+        border-radius: 12px;
+      }
+      
+      .screen {
+        padding: 10px;
+      }
+      
+      #quiz, #scoreScreen, #finalScreen {
+        padding: 15px;
+      }
+      
+      #questionText {
+        font-size: 1.1rem;
+      }
+      
+      .optionBtn {
+        padding: 10px;
+        font-size: 0.95rem;
+      }
+      
+      button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        min-width: 120px;
+      }
+      
+      .stats {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      #mobileControls {
+        display: flex;
+      }
+      
+      /* Hide up arrow on mobile */
+      #upBtn {
+        display: none !important;
+      }
+    }
+    
+   /* Portrait-specific adjustments */
 @media (max-width: 768px) and (orientation: portrait) {
   #startCanvas {
-    max-height: 300px;
+    min-height: 250px;
   }
+  
+  h1 {
+    font-size: 2rem;
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+  
+  .controls-info {
+    font-size: 18px;
+    bottom: 60px;
+  }
+}
 
+@media (max-width: 480px) and (orientation: portrait) {
   h1 {
     font-size: 1.8rem;
-    margin-bottom: 10px;
   }
-
-  .level-indicator {
-    font-size: 1rem;
-  }
-}
-
-/* Small portrait phones */
-@media (max-width: 480px) and (orientation: portrait) {
-  #startCanvas {
-    max-height: 250px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-}
-/* =========================
-   📱 Ultra Small Screens (≤480px)
-   ========================= */
-@media (max-width: 480px) {
-  h1:after {
-    right: -30px;
-    font-size: 1.5rem;
-  }
-
-  .level-indicator {
-    font-size: 1rem;
-    padding: 6px 12px;
-  }
-
-  .control-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-
-  .jump-btn,
-  .shoot-btn {
-    width: 60px;
-    height: 60px;
-  }
-
-  .jump-btn {
-    font-size: 14px;
-  }
-
-  .shoot-btn {
-    font-size: 12px;
-    bottom: 80px;
+  
+  .controls-info {
+    font-size: 16px;
   }
 }
 
-
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      h1:after {
+        right: -30px;
+        font-size: 1.5rem;
+      }
+      
+      .level-indicator {
+        font-size: 1rem;
+        padding: 6px 12px;
+      }
+      
+      .control-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+      }
+      
+      .jump-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 14px;
+      }
+      
+      .shoot-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 12px;
+        bottom: 80px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -925,7 +935,6 @@ function drawEnemy(x, y) {
   startCtx.fill();
 }
 
-// Function to show specific screen and hide others
 function showScreen(screen) {
   // Hide all screens
   startScreen.style.display = 'none';
@@ -936,37 +945,25 @@ function showScreen(screen) {
   startCanvas.style.display = 'none';
   document.querySelector('.controls-info')?.style.setProperty('display', 'none');
 
-  // Hide .game-container unless showing start screen
-  const gameContainer = document.querySelector('.game-container');
-  if (screen === startScreen) {
-    gameContainer.style.display = 'block';
-  } else {
-    gameContainer.style.display = 'none';
-  }
-  // Hide floating elements
-  startCanvas.style.display = 'none';
-  document.querySelector('.controls-info')?.style.setProperty('display', 'none');
-  
   // Show requested screen
   screen.style.display = 'flex';
   
-  // Set game-active class only when showing game canvas
-  if (screen === gameCanvas) {
-    gameContainer.classList.add('game-active');
-    gameCanvas.style.display = 'block';
-  } else {
-    gameContainer.classList.remove('game-active');
-    
-    // Special handling for start screen
-    if (screen === startScreen) {
-      startScreen.style.display = 'flex';
-      startCanvas.style.display = 'block';
-      document.querySelector('.controls-info')?.style.setProperty('display', 'block');
-      if (window._startScreenAnimFrame) cancelAnimationFrame(window._startScreenAnimFrame);
+  // Toggle game-active class
+  const gameContainer = document.querySelector('.game-container');
+  gameContainer.classList.toggle('game-active', screen === gameCanvas);
+
+  // Special handling for start screen
+  if (screen === startScreen) {
+    startCanvas.style.display = 'block';
+    document.querySelector('.controls-info')?.style.setProperty('display', 'block');
+    if (!window._startScreenAnimFrame) {
       animateStartScreen();
-    } else {
-      if (window._startScreenAnimFrame) cancelAnimationFrame(window._startScreenAnimFrame);
-        }
+    }
+  } else {
+    if (window._startScreenAnimFrame) {
+      cancelAnimationFrame(window._startScreenAnimFrame);
+      window._startScreenAnimFrame = null;
+    }
   }
 }
 
