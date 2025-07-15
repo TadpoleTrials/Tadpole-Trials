@@ -316,7 +316,7 @@
       font-size: 1.2rem;
     }
     
-   /* Mobile Controls */
+/* Mobile Controls */
 #mobileControls {
   display: none;
   position: absolute;
@@ -332,7 +332,6 @@
   .game-container.game-active #mobileControls {
     display: flex;
   }
-}
 
 #mobileControls,
 #mobileControls button {
@@ -469,9 +468,7 @@
         gap: 10px;
       }
       
-      #mobileControls {
-        display: flex;
-      }
+  
       
       /* Hide up arrow on mobile */
       #upBtn {
@@ -549,65 +546,64 @@
   </header>
   
   <div class="game-container">
-    <!-- Mobile Controls -->
-    <div id="mobileControls">
-      <div class="dpad-container">
-        <div class="dpad-row">
-          <div class="control-btn" id="upBtn">↑</div>
-        </div>
-        <div class="dpad-row">
-          <div class="control-btn" id="leftBtn">←</div>
-          <div class="control-btn" id="downBtn" style="visibility: hidden;"></div>
-          <div class="control-btn" id="rightBtn">→</div>
-        </div>
+  <!-- Mobile Controls -->
+  <div id="mobileControls">
+    <div class="dpad-container">
+      <div class="dpad-row">
+        <div class="control-btn" id="upBtn">↑</div>
       </div>
-      <div class="jump-btn" id="jumpBtn">JUMP</div>
-      <div class="shoot-btn" id="shootBtn">SHOOT</div>
+      <div class="dpad-row">
+        <div class="control-btn" id="leftBtn">←</div>
+        <div class="control-btn" id="downBtn" style="visibility: hidden;"></div>
+        <div class="control-btn" id="rightBtn">→</div>
+      </div>
     </div>
-    
-    <!-- Start Screen -->
-    <div id="startScreen">
-      <canvas id="startCanvas"></canvas>
-      <div class="controls-info">← → to move • SPACE to jump • F/SHOOT to fire</div>
-      <button id="startBtn">Start Game</button>
-    </div>
+    <div class="jump-btn" id="jumpBtn">JUMP</div>
+    <div class="shoot-btn" id="shootBtn">SHOOT</div>
   </div>
-  
 
-    <!-- Game Canvas -->
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
-    <div id="deathOverlay" class="death-overlay">
-      <div class="death-message">Oh no! Press R to respawn</div>
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <canvas id="startCanvas"></canvas>
+    <div class="controls-info">← → to move • SPACE to jump • F/SHOOT to fire</div>
+    <button id="startBtn">Start Game</button>
+  </div>
+
+  <!-- ✅ Moved Game Canvas & Overlay INSIDE container -->
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <div id="deathOverlay" class="death-overlay">
+    <div class="death-message">Oh no! Press R to respawn</div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz" class="screen">
+    <h2>Biology Quiz</h2>
+    <div class="brain-counter">
+      <span class="brain-icon">🧠</span> 
+      <span id="collectedCount">0</span> Collected
     </div>
-    
-    <!-- Quiz Screen -->
-    <div id="quiz" class="screen">
-      <h2>🧠 Biology Quiz</h2>
-      <div class="brain-counter">
-        <span class="brain-icon">🧠</span> 
-        <span id="collectedCount">0</span> Collected
-      </div>
-      <h3 id="questionText"></h3>
-      <div id="optionsContainer"></div>
-    </div>
-    
-    <!-- Score Screen -->
-    <div id="scoreScreen" class="screen">
-      <h2>Level Complete! 🎉</h2>
-      <h3 id="scoreSummary"></h3>
-      <div class="controls">
-        <button id="retryBtn">🔁 Retry Level</button>
-        <button id="nextBtn">➡ Next Level</button>
-      </div>
-    </div>
-    
-    <!-- Final Screen -->
-    <div id="finalScreen" class="screen">
-      <h2>Congratulations! 🏆</h2>
-      <h3 id="finalText"></h3>
-      <button id="restartBtn">Play Again</button>
+    <h3 id="questionText"></h3>
+    <div id="optionsContainer"></div>
+  </div>
+
+  <!-- Score Screen -->
+  <div id="scoreScreen" class="screen">
+    <h2>Level Complete! 🎉</h2>
+    <h3 id="scoreSummary"></h3>
+    <div class="controls">
+      <button id="retryBtn">🔁 Retry Level</button>
+      <button id="nextBtn">➡ Next Level</button>
     </div>
   </div>
+
+  <!-- Final Screen -->
+  <div id="finalScreen" class="screen">
+    <h2>Congratulations! 🏆</h2>
+    <h3 id="finalText"></h3>
+    <button id="restartBtn">Play Again</button>
+  </div>
+</div>
+
 
   <script>
     // Mobile detection
