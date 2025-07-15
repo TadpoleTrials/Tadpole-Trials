@@ -539,7 +539,7 @@
       }
     }
 
-    @media (max-width: 768px) and (orientation: portrait) {
+   @media (max-width: 768px) and (orientation: portrait) {
   #mobileControls {
     position: static;
     margin-top: 10px;
@@ -553,13 +553,15 @@
   }
 
   .right-controls {
-    flex-direction: column-reverse; /* 👈 puts JUMP below SHOOT */
+    flex-direction: column-reverse;
     align-items: flex-end;
+    gap: 15px; /* spacing between buttons */
   }
 
   .jump-btn,
   .shoot-btn {
-    position: static;
+    position: static !important;
+    bottom: auto !important;
     margin: 0;
     width: 60px;
     height: 60px;
@@ -567,20 +569,6 @@
   }
 }
 
-@media (max-width: 768px) and (orientation: portrait) {
-  .shoot-btn,
-  margin-bottom: 10px;
-  .jump-btn {
-    position: static !important;
-    bottom: auto !important;
-  }
-
-  .right-controls {
-    flex-direction: column-reverse;
-    align-items: flex-end;
-    gap: 15px;
-  }
-}
 
   </style>
 </head>
