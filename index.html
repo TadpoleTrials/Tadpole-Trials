@@ -571,7 +571,20 @@
   </header>
   
   <div class="game-container">
-  <!-- Mobile Controls -->
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <canvas id="startCanvas"></canvas>
+    <div class="controls-info">← → to move • SPACE to jump • F/SHOOT to fire</div>
+    <button id="startBtn">Start Game</button>
+  </div>
+
+  <!-- ✅ Moved Game Canvas & Overlay INSIDE container -->
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <div id="deathOverlay" class="death-overlay">
+    <div class="death-message">Oh no! Press R to respawn</div>
+  </div>
+
+<!-- Mobile Controls -->
   <div id="mobileControls">
     <div class="dpad-container">
       <div class="dpad-row">
@@ -585,19 +598,6 @@
     </div>
     <div class="jump-btn" id="jumpBtn">JUMP</div>
     <div class="shoot-btn" id="shootBtn">SHOOT</div>
-  </div>
-
-  <!-- Start Screen -->
-  <div id="startScreen">
-    <canvas id="startCanvas"></canvas>
-    <div class="controls-info">← → to move • SPACE to jump • F/SHOOT to fire</div>
-    <button id="startBtn">Start Game</button>
-  </div>
-
-  <!-- ✅ Moved Game Canvas & Overlay INSIDE container -->
-  <canvas id="gameCanvas" width="800" height="400"></canvas>
-  <div id="deathOverlay" class="death-overlay">
-    <div class="death-message">Oh no! Press R to respawn</div>
   </div>
 
   <!-- Quiz Screen -->
