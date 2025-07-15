@@ -567,7 +567,18 @@
   }
 }
 
+@media (max-width: 768px) and (orientation: portrait) {
+  .shoot-btn,
+  .jump-btn {
+    position: static !important;
+    bottom: auto !important;
+  }
 
+  .right-controls {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+}
 
   </style>
 </head>
