@@ -65,7 +65,7 @@
       padding: 15px;
     }
     
-    /* New Start Screen Styles */
+    /* Updated Start Screen Styles */
 #startScreen {
   width: 100%;
   max-width: 800px;
@@ -74,31 +74,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Changed from center to flex-start */
+  min-height: 400px; /* Minimum height */
+  overflow: hidden;
 }
 
 #startCanvas {
   width: 100%;
-  max-width: 800px;
-  height: 400px;
+  height: auto; /* Changed from fixed height */
+  aspect-ratio: 2/1; /* Maintain 2:1 aspect ratio */
+  max-height: 400px;
   display: block;
 }
 
 #startBtn {
   margin-top: 20px;
   z-index: 2;
+  position: relative; /* Ensure it stays above canvas */
 }
-
 
 .controls-info {
   position: absolute;
-  bottom: 80px;
+  bottom: 65px; /* Adjusted from 80px */
   left: 0;
   width: 100%;
   text-align: center;
   color: rgba(255,255,255,0.8);
-  font-size: 20px;
+  font-size: clamp(16px, 4vw, 20px); /* Responsive font size */
   pointer-events: none;
+  padding: 10px;
+  box-sizing: border-box;
 }
     
     #gameCanvas {
@@ -300,6 +305,7 @@
     }
     
    /* Mobile Controls */
+/* Mobile Controls - initially hidden */
 #mobileControls {
   display: none;
   position: absolute;
@@ -308,6 +314,11 @@
   justify-content: space-between;
   z-index: 5;
   pointer-events: none;
+}
+
+/* Show mobile controls only when game is active AND on mobile */
+.game-container.game-active #mobileControls {
+  display: flex;
 }
 
 #mobileControls,
@@ -455,6 +466,31 @@
       }
     }
     
+    @media (max-width: 768px) and (orientation: portrait) {
+  #startCanvas {
+    max-height: 300px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+  
+  .level-indicator {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  #startCanvas {
+    max-height: 250px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+}
+
     @media (max-width: 480px) {
       h1 {
         font-size: 1.8rem;
@@ -909,18 +945,23 @@ function showScreen(screen) {
   // Show requested screen
   screen.style.display = 'flex';
   
-  // Toggle game-active class on game container (replaces the mobileControls check)
-  document.querySelector('.game-container').classList.toggle('game-active', screen === gameCanvas);
-
-  // If showing start screen, show canvas and controls-info, start animation
-  if (screen === startScreen) {
-    startScreen.style.display = 'flex';
-    startCanvas.style.display = 'block';
-    document.querySelector('.controls-info')?.style.setProperty('display', 'block');
-    if (window._startScreenAnimFrame) cancelAnimationFrame(window._startScreenAnimFrame);
-    animateStartScreen();
+  // Set game-active class only when showing game canvas
+  if (screen === gameCanvas) {
+    gameContainer.classList.add('game-active');
+    gameCanvas.style.display = 'block';
   } else {
-    if (window._startScreenAnimFrame) cancelAnimationFrame(window._startScreenAnimFrame);
+    gameContainer.classList.remove('game-active');
+    
+    // Special handling for start screen
+    if (screen === startScreen) {
+      startScreen.style.display = 'flex';
+      startCanvas.style.display = 'block';
+      document.querySelector('.controls-info')?.style.setProperty('display', 'block');
+      if (window._startScreenAnimFrame) cancelAnimationFrame(window._startScreenAnimFrame);
+      animateStartScreen();
+    } else {
+      if (window._startScreenAnimFrame) cancelAnimationFrame(window._startScreenAnimFrame);
+        }
   }
 }
 
