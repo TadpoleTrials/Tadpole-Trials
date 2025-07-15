@@ -406,125 +406,130 @@
       right: 10px;
       bottom: 90px;
     }
-    
-    /* Mobile-specific adjustments */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2rem;
-      }
-      
-      h1:after {
-        right: -35px;
-        font-size: 1.8rem;
-      }
-      
-      .game-container {
-        padding: 10px;
-        border-radius: 12px;
-      }
-      
-      .screen {
-        padding: 10px;
-      }
-      
-      #quiz, #scoreScreen, #finalScreen {
-        padding: 15px;
-      }
-      
-      #questionText {
-        font-size: 1.1rem;
-      }
-      
-      .optionBtn {
-        padding: 10px;
-        font-size: 0.95rem;
-      }
-      
-      button {
-        padding: 10px 20px;
-        font-size: 1rem;
-        min-width: 120px;
-      }
-      
-      .stats {
-        flex-direction: column;
-        gap: 8px;
-      }
-      
-      .controls {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      #mobileControls {
-        display: flex;
-      }
-      
-      /* Hide up arrow on mobile */
-      #upBtn {
-        display: none !important;
-      }
-    }
-    
-    @media (max-width: 768px) and (orientation: portrait) {
+
+    /* =========================
+   📱 Base Mobile Styles (≤768px)
+   ========================= */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h1:after {
+    right: -35px;
+    font-size: 1.8rem;
+  }
+
+  .game-container {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .screen {
+    padding: 10px;
+  }
+
+  #quiz, #scoreScreen, #finalScreen {
+    padding: 15px;
+  }
+
+  #questionText {
+    font-size: 1.1rem;
+  }
+
+  .optionBtn {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    min-width: 120px;
+  }
+
+  .stats,
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #mobileControls {
+    display: flex;
+  }
+
+  /* Hide up arrow on mobile (redundant with jump button) */
+  #upBtn {
+    display: none !important;
+  }
+}
+/* ========================================
+   📱 Portrait-Specific Tweaks (≤768px & ≤480px)
+   ======================================== */
+
+/* Medium screen portrait (e.g. tablets or tall phones) */
+@media (max-width: 768px) and (orientation: portrait) {
   #startCanvas {
     max-height: 300px;
   }
-  
+
   h1 {
     font-size: 1.8rem;
     margin-bottom: 10px;
   }
-  
+
   .level-indicator {
     font-size: 1rem;
   }
 }
 
+/* Small portrait phones */
 @media (max-width: 480px) and (orientation: portrait) {
   #startCanvas {
     max-height: 250px;
   }
-  
+
   h1 {
     font-size: 1.5rem;
   }
 }
+/* =========================
+   📱 Ultra Small Screens (≤480px)
+   ========================= */
+@media (max-width: 480px) {
+  h1:after {
+    right: -30px;
+    font-size: 1.5rem;
+  }
 
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      h1:after {
-        right: -30px;
-        font-size: 1.5rem;
-      }
-      
-      .level-indicator {
-        font-size: 1rem;
-        padding: 6px 12px;
-      }
-      
-      .control-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-      }
-      
-      .jump-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 14px;
-      }
-      
-      .shoot-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 12px;
-        bottom: 80px;
-      }
-    }
+  .level-indicator {
+    font-size: 1rem;
+    padding: 6px 12px;
+  }
+
+  .control-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .jump-btn,
+  .shoot-btn {
+    width: 60px;
+    height: 60px;
+  }
+
+  .jump-btn {
+    font-size: 14px;
+  }
+
+  .shoot-btn {
+    font-size: 12px;
+    bottom: 80px;
+  }
+}
+
+
   </style>
 </head>
 <body>
