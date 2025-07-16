@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -469,7 +470,6 @@
         gap: 10px;
       }
       
-  
       
       /* Hide up arrow on mobile */
       #upBtn {
@@ -477,6 +477,13 @@
       }
     }
     
+@media (max-width: 768px) {
+  .controls-info {
+    display: none !important;
+  }
+}
+
+
    /* Portrait-specific adjustments */
 @media (max-width: 768px) and (orientation: portrait) {
   #startCanvas {
