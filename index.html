@@ -8,7 +8,7 @@
   <meta name="description" content="Jump into Tadpole Trials – a fun, fast-paced biology quiz game! Test your VCE Biology knowledge in this free educational platformer designed for high school students.">
   <!-- Open Graph Meta Tags for Social Sharing -->
 <meta property="og:title" content="Tadpole Trials – a biology revision game">
-<meta property="og:description" content="Collect brains and answer questions in this fun and challenging platformer. Play and learn at the same time!">
+<meta property="og:description" content="Collect brains and answer biology questions in this fun and challenging platformer. Play and learn at the same time!">
 <meta property="og:image" content="https://svkhhnulgictmdvqvwte.supabase.co/storage/v1/object/public/social//SocialTadpoleTrials.jpg">
 <meta property="og:url" content="https://tadpoletrials.1strankbiology.com">
 <meta property="og:type" content="website">
@@ -1105,9 +1105,9 @@ function showScreen(screen) {
   // Show requested screen
   screen.style.display = 'flex';
 
-  // Hide copyright if quiz or score screen, show otherwise
+  // Hide copyright if quiz, score, or gameplay screen, show otherwise
   const copyright = document.querySelector('.copyright');
-  if (screen === quizScreen || screen === scoreScreen) {
+  if (screen === quizScreen || screen === scoreScreen || screen === gameCanvas) {
     copyright.style.display = 'none';
   } else {
     copyright.style.display = 'block';
