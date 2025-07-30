@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tadpole Trials - 1st Rank Biology</title>
+  <link rel="icon" href="https://svkhhnulgictmdvqvwte.supabase.co/storage/v1/object/public/favicon//favicon.png" type="image/png">
+  <meta name="description" content="Jump into Tadpole Trials – a fun, fast-paced biology quiz game! Test your VCE Biology knowledge in this free educational platformer designed for high school students.">
+  <!-- Open Graph Meta Tags for Social Sharing -->
+<meta property="og:title" content="Tadpole Trials – A biology revision game">
+<meta property="og:description" content="Answer Biology questions in this fun and challenging platformer. Play and learn at the same time!">
+<meta property="og:image" content="https://svkhhnulgictmdvqvwte.supabase.co/storage/v1/object/public/social//SocialTadpoleTrials.jpg">
+<meta property="og:url" content="https://tadpoletrials.1strankbiology.com">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tadpole Trials – A Biology Revision Game">
+<meta name="twitter:description" content="Play Tadpole Trials to test your biology knowledge in a fun, quiz-based platformer!">
+<meta name="twitter:image" content="https://svkhhnulgictmdvqvwte.supabase.co/storage/v1/object/public/social//SocialTadpoleTrials.jpg">
+
   <style>
 /* Logo link styles */
 header a {
@@ -658,6 +673,13 @@ input:checked + .toggle-slider:before {
   font-size: 0.9rem;
   vertical-align: middle;
 }
+/* Default styling */
+.copyright {
+  text-align: center;
+  font-size: 0.3rem;
+  color: #ccc;
+  margin-top: 15px;
+}
 }
 
 
@@ -695,6 +717,11 @@ input:checked + .toggle-slider:before {
   <div id="deathOverlay" class="death-overlay">
     <div class="death-message">Oh no! Press R to respawn</div>
   </div>
+
+<div class="copyright">
+  © 2025 Aaron Gillespie
+</div>
+
 
 <div id="mobileControls">
   <div class="left-controls">
@@ -1077,7 +1104,15 @@ function showScreen(screen) {
 
   // Show requested screen
   screen.style.display = 'flex';
-  
+
+  // Hide copyright if quiz or score screen, show otherwise
+  const copyright = document.querySelector('.copyright');
+  if (screen === quizScreen || screen === scoreScreen) {
+    copyright.style.display = 'none';
+  } else {
+    copyright.style.display = 'block';
+  }
+
   // Toggle game-active class
   const gameContainer = document.querySelector('.game-container');
   gameContainer.classList.toggle('game-active', screen === gameCanvas);
@@ -1217,7 +1252,7 @@ function showScreen(screen) {
   gameState.brains.push({x: 600, y: 210, collected: false});
   gameState.brains.push({x: 950, y: 250, collected: false});
   gameState.brains.push({x: 1300, y: 210, collected: false});
-  gameState.brains.push({x: 1650, y: 250, collected: false});
+  gameState.brains.push({x: 1650, y: 210, collected: false});
         
         // Add enemies
         gameState.enemies.push({
@@ -1246,7 +1281,7 @@ function showScreen(screen) {
         // Add platforms
         gameState.platforms.push({x: 200, y: 280, width: 100, height: 20});
         gameState.platforms.push({x: 400, y: 230, width: 100, height: 20});
-        gameState.platforms.push({x: 600, y: 280, width: 100, height: 20});
+        gameState.platforms.push({x: 650, y: 280, width: 100, height: 20});
         gameState.platforms.push({x: 800, y: 200, width: 100, height: 20});
         gameState.platforms.push({x: 1000, y: 280, width: 100, height: 20});
         gameState.platforms.push({x: 1200, y: 230, width: 100, height: 20});
@@ -1259,7 +1294,7 @@ function showScreen(screen) {
         // Add 5 brains
           gameState.brains.push({x: 300, y: 230, collected: false});
   gameState.brains.push({x: 750, y: 180, collected: false});
-  gameState.brains.push({x: 1200, y: 230, collected: false});
+  gameState.brains.push({x: 1200, y: 210, collected: false});
   gameState.brains.push({x: 1700, y: 180, collected: false});
   gameState.brains.push({x: 2200, y: 300, collected: false});
         
@@ -1304,7 +1339,7 @@ function showScreen(screen) {
         // Add platforms
         gameState.platforms.push({x: 200, y: 280, width: 70, height: 20});
         gameState.platforms.push({x: 400, y: 230, width: 70, height: 20});
-        gameState.platforms.push({x: 700, y: 180, width: 70, height: 20});
+        gameState.platforms.push({x: 600, y: 180, width: 70, height: 20});
         gameState.platforms.push({x: 800, y: 230, width: 70, height: 20});
         gameState.platforms.push({x: 1000, y: 280, width: 70, height: 20});
         gameState.platforms.push({x: 1200, y: 230, width: 70, height: 20});
@@ -1314,7 +1349,7 @@ function showScreen(screen) {
         gameState.platforms.push({x: 2000, y: 230, width: 70, height: 20});
         gameState.platforms.push({x: 2200, y: 180, width: 70, height: 20});
         gameState.platforms.push({x: 2400, y: 230, width: 70, height: 20});
-        gameState.platforms.push({x: 2600, y: 280, width: 200, height: 20});
+        gameState.platforms.push({x: 2600, y: 280, width: 100, height: 20});
         gameState.platforms.push({x: 2800, y: 340, width: 200, height: 20});
 
           // 5 brains (strategic placement on narrow platforms)
@@ -1434,6 +1469,13 @@ gameState.enemies = [
     alive: true
   }
 ];
+// Ranged enemy
+        gameState.enemies.push({
+          x: 2300, y: 100, width: 30, height: 30, 
+          velX: 0, attackTimer: 60, attackRange: 300,
+          type: 'ranged',
+          alive: true
+        });
 
   } else if (level === 5) {
     gameState.levelWidth = 3200; // Slightly longer for new enemies
@@ -1550,12 +1592,12 @@ gameState.enemies = [
     // Elevation climb
     {x: 1180, y: 280, width: 140, height: 20},
     {x: 1280, y: 280, width: 120, height: 20},
-    {x: 1500, y: 240, width: 80, height: 20},
+    {x: 1500, y: 240, width: 60, height: 20},
     {x: 1650, y: 200, width: 100, height: 20}, // Highest point
     
     // Descending maze
-    {x: 1780, y: 240, width: 100, height: 20},
-    {x: 2000, y: 280, width: 120, height: 20},
+    {x: 1780, y: 240, width: 80, height: 20},
+    {x: 2000, y: 280, width: 100, height: 20},
     {x: 2150, y: 280, width: 140, height: 20},
     {x: 2300, y: 300, width: 140, height: 20},
     {x: 2500, y: 320, width: 120, height: 20},
@@ -1563,13 +1605,11 @@ gameState.enemies = [
     {x: 2890, y: 300, width: 180, height: 20},
     
     // Final stretch
-    {x: 3000, y: 280, width: 10, height: 20}, // Narrow platform
-     {x: 3100, y: 290, width: 10, height: 20}, // Narrow platform
     {x: 3200, y: 320, width: 210, height: 20}, // Safe zone
     {x: 3400, y: 320, width: 210, height: 20}, // Safe zone
     {x: 3300, y: 320, width: 210, height: 20}, // Safe zone
-    {x: 3400, y: 320, width: 210, height: 20}, // Safe zone
-    {x: 3600, y: 350, width: 400, height: 20}  // Exit
+    {x: 3400, y: 320, width: 190, height: 20}, // Safe zone
+    {x: 3600, y: 350, width: 350, height: 20}  // Exit
   ];
 
   // Brains - Require risk or skill
@@ -1644,7 +1684,7 @@ gameState.enemies = [
         {x: 50, y: 350, width: 250, height: 25},
         
         // First section - gentle warm-up
-        {x: 350, y: 320, width: 120, height: 25},
+        {x: 350, y: 320, width: 100, height: 25},
         {x: 520, y: 290, width: 100, height: 25},
         {x: 700, y: 320, width: 120, height: 25},
         
@@ -1709,10 +1749,23 @@ gameState.enemies = [
             type: 'ground',
             alive: true
         },
+        // Ranged enemy
+    {
+      x: 900, y: 260, width: 30, height: 30,
+      velX: 0, attackTimer: 20, attackRange: 300, // Faster attacks
+      type: 'ranged',
+      alive: true
+    },
+    {
+      x: 1500, y: 300, width: 30, height: 30,
+      velX: 0, attackTimer: 20, attackRange: 300, // Faster attacks
+      type: 'ranged',
+      alive: true
+    },
         // Final enemy - ranged attacker
         {
             x: 3000, y: 250, width: 35, height: 35,
-            velX: 0, attackTimer: 60, attackRange: 350,
+            velX: 0, attackTimer: 15, attackRange: 350,
             type: 'ranged',
             alive: true
         }
